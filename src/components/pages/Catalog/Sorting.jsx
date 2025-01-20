@@ -27,7 +27,6 @@ const Sorting = ({ onSort }) => {
                    });
                  e.target.classList.add("checked");
               }}
-            
             >
               {option.label}
             </a>

@@ -41,7 +41,7 @@ const CardDetails = () => {
     };
 
     return (
-        <>
+        
             <Modal
                 isOpen={isModalOpen}
                 currentImage={currentImage}
@@ -65,8 +65,7 @@ const CardDetails = () => {
                 <h1>Комментарии</h1>  
             </div>  
             <Comments/>
-
-        </>
+        
     );
 };
 

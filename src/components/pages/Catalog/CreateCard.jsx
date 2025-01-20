@@ -1,4 +1,5 @@
-import React from 'react';
+import 'react';
+import PropTypes from "prop-types";
 
 const CreateCard = ({ data, onCardClick }) => {
     return (
@@ -22,5 +23,8 @@ const CreateCard = ({ data, onCardClick }) => {
     </>
     );
 };
-
+CreateCard.propTypes = {
+  data: PropTypes.func.isRequired,
+  onCardClick: PropTypes.func.isRequired,
+};
 export default CreateCard;
