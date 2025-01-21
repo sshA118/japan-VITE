@@ -8,8 +8,7 @@ const Home = () => {
         <>
             <Slider />
             <CardSlider />
-            <AboutTokyo />
-            
+            <AboutTokyo /> 
         </>
         );
 }

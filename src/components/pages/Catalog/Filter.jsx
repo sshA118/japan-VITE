@@ -1,30 +1,31 @@
 import PropTypes from "prop-types";
+import "../../../pages/Catalog/Catalog.css";
+
 const Filter = ({ onFilter }) => {
-    const categories = [
-      { label: "Парки", value: "parks" },
-      { label: "Музеи", value: "museums" },
-      { label: "Рестораны", value: "restaurants" },
-      { label: "Храмы", value: "temples" },
-      { label: "Торговые центры", value: "malls" },
-      { label: "Уличные рынки", value: "markets" },
-    ];
+  const categories = [
+    { label: "Парки", value: "parks" },
+    { label: "Музеи", value: "museums" },
+    { label: "Рестораны", value: "restaurants" },
+    { label: "Храмы", value: "temples" },
+    { label: "Торговые центры", value: "malls" },
+    { label: "Уличные рынки", value: "markets" },
+  ];
 
   return (
-    <div className="filter" id={"filter"}>
-      <button className="drop" id={"drop"}>
+    <div className="filter" id="filter">
+      <button className="drop" id="drop">
         Локации
       </button>
-      <div className="filter__box" id={"filter__box"}>
-        <div className="filter__list" id={"filter__list"}>
+      <div className="filter__box" id="filter__box">
+        <div className="filter__list" id="filter__list">
           {categories.map((category, index) => (
             <a
               key={index}
               className="filter__list__category"
-              id={"filter__list__category"}
+              id={`filter__list__category-${index}`}
               onClick={(e) => {
                 e.preventDefault();
                 onFilter(category.value.toLocaleLowerCase());
-                console.log(category.value.toLocaleLowerCase());
                 document
                   .querySelectorAll(".filter__list__category")
                   .forEach((el) => {
@@ -41,20 +42,24 @@ const Filter = ({ onFilter }) => {
             onClick={(e) => {
               e.preventDefault();
               onFilter("");
-              document.querySelectorAll(".filter__list__category").forEach((el) => {
+              document
+                .querySelectorAll(".filter__list__category")
+                .forEach((el) => {
                   el.classList.remove("checked");
                 });
               e.target.classList.add("checked");
             }}
           >
-            Убрать все
+            Убрать фильтр
           </a>
         </div>
       </div>
     </div>
   );
 };
+
 Filter.propTypes = {
-    onFilter: PropTypes.func.isRequired,
+  onFilter: PropTypes.func.isRequired,
 };
+
 export default Filter;

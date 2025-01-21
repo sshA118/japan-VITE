@@ -37,20 +37,6 @@
   color: #fff;
 }
 
-.gallery {
-  display: flex;
-  gap: 10px;
-  padding: 20px;
-  justify-content: center;
-}
-@media (max-width: 436px) {
-  .gallery {
-    margin-left: 2px;
-    scroll-snap-align: start;
-    overflow-x: scroll;
-  }
-}
-
 .thumbnail {
   width: 150px;
   height: 100px;
@@ -58,6 +44,11 @@
      object-fit: cover;
   cursor: pointer;
   border: 2px solid #ccc;
+}
+
+.thumbnails {
+  position: fixed;
+  top: 790px;
 }
 
 .modal {
@@ -73,14 +64,8 @@
 }
 
 .modal img {
-  max-width: 90%;
-  max-height: 90%;
-}
-@media (max-width: 436px) {
-  .modal img {
-    max-width: 70%;
-    max-height: 70%;
-  }
+  max-width: 70%;
+  max-height: 70%;
 }
 
 .close {
@@ -133,33 +118,22 @@
   border-radius: 15px;
   width: 500px;
   height: 400px;
+  display: flex;
 }
 @media (max-width: 1025px) {
   .bigImage {
-    display: none;
+    width: 25%;
   }
 }
 @media (max-width: 426px) {
   .bigImage {
-    display: none;
+    width: 25%;
   }
 }
 @media (max-width: 376px) {
   .bigImage {
-    display: none;
+    width: 25%;
   }
-}
-
-.block__img1 {
-  width: 25%;
-}
-
-.block__img2 {
-  width: 25%;
-}
-
-.block__img3 {
-  width: 25%;
 }
 
 .coments {
@@ -171,6 +145,13 @@
 
 .coments__title__p {
   margin-top: 10px;
+}
+
+.delete__button {
+  background-color: #e73e58;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
 }
 
 .modal__comments {
@@ -197,7 +178,7 @@
   background-color: #e73e58;
   color: #fff;
   border-radius: 15px;
-  float: right;
+  float: left;
 }
 
 .comments-list {

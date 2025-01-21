@@ -1,6 +1,4 @@
-
 const CardSlider = () => {
-
     return (
         <div className="slaider">
             <h2 className="slaider__h2">Какие места стоит посетить</h2>

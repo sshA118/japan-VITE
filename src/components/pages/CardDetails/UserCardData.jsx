@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-
+import PropTypes from 'prop-types';
 const UserCardData = (id) => {
     const [cardData, setCardData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -20,11 +19,12 @@ const UserCardData = (id) => {
                 setLoading(false);
             }
         };
-
         fetchData();
     }, [id]);
 
     return { cardData, loading, error };
 };
-
+UserCardData.propTypes = {
+  id: PropTypes.string.isRequired,
+};
 export default UserCardData;

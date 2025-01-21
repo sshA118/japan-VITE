@@ -1,114 +1,142 @@
-import React, { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import PropTypes from "prop-types";
+import { useState } from "react";
+const Comments = ({ cardId }) => {
+  const queryClient = useQueryClient();
+  const [name, setName] = useState("");
+  const [commentText, setCommentText] = useState("");
 
-const Comments = () => {
-    const [comments, setComments] = useState([]);
-    const [name, setName] = useState('');
-    const [age, setAge] = useState('');
-    const [commentText, setCommentText] = useState('');
+  // Загрузка комментариев с кэшированием
+  const {
+    data: comments,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["comments", cardId], // Уникальный ключ для кэширования
+    queryFn: async () => {
+      const response = await fetch(
+        "https://672a07666d5fa4901b6f7076.mockapi.io/comments"
+      );
+      if (!response.ok) {
+        throw new Error("Ошибка загрузки комментариев");
+      }
+      const data = await response.json();
+      return data.filter((comment) => comment.CardID === parseInt(cardId));
+    },
+    staleTime: 1000 * 60 * 5, // Данные считаются "свежими" 5 минут
+    cacheTime: 1000 * 60 * 10, // Данные хранятся в кэше 10 минут
+  });
 
-    useEffect(() => {
-        loadComments();
-    }, []);
-    // const UrlParams = async () =>{
-    //     console.log(useLocation.pathname)
-    // }
-    // UrlParams()
-    const loadComments = async () => {
-        try {
-            const response = await fetch('https://672a07666d5fa4901b6f7076.mockapi.io/comments');
-            const data = await response.json();
-            setComments(data);
-        } catch (error) {
-            console.error('Ошибка загрузки комментариев:', error);
+  // Удаление комментария
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      await fetch(
+        `https://672a07666d5fa4901b6f7076.mockapi.io/comments/${id}`,
+        {
+          method: "DELETE",
         }
-    };
+      );
+    },
+    onSuccess: () => {
+      // Инвалидируем кэш, чтобы обновить данные
+      queryClient.invalidateQueries({ queryKey: ["comments", cardId] });
+    },
+  });
 
-    const deleteComment = async (id) => {
-        try {
-            await fetch(`https://672a07666d5fa4901b6f7076.mockapi.io/comments/${id}`, {
-                method: 'DELETE',
-            });
-            loadComments();
-        } catch (error) {
-            console.error('Ошибка удаления комментария:', error);
+  // Добавление комментария
+  const addMutation = useMutation({
+    mutationFn: async (newComment) => {
+      const response = await fetch(
+        "https://672a07666d5fa4901b6f7076.mockapi.io/comments",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newComment),
         }
-    };
+      );
+      if (!response.ok) {
+        throw new Error("Ошибка отправки комментария");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      // Инвалидируем кэш, чтобы обновить данные
+      queryClient.invalidateQueries({ queryKey: ["comments", cardId] });
+      setName("");
+      setCommentText("");
+    },
+  });
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!name || !commentText) {
-            alert('Заполните имя и текст комментария.');
-            return;
-        }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!name || !commentText) {
+      return;
+    }
+    addMutation.mutate({
+      name,
+      text: commentText,
+      CardID: parseInt(cardId),
+    });
+  };
 
-        try {
-            await fetch('https://672a07666d5fa4901b6f7076.mockapi.io/comments', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    name,
-                    age,
-                    text: commentText,
-                }),
-            });
-            setName('');
-            setAge('');
-            setCommentText('');
-            loadComments();
-        } catch (error) {
-            console.error('Ошибка отправки комментария:', error);
-        }
-    };
+  if (isLoading) return <div>Загрузка комментариев...</div>;
+  if (isError) return <div>Ошибка: {error.message}</div>;
 
-    return (
-        <>
-            
-            <div className="container__comments">
-                <div className="comments-list">
-                    {comments.map((comment) => (
-                        <div key={comment.id} className="comment-item">
-                            <p><strong>Имя:</strong> {comment.name}</p>
-                            <p><strong>Достопримечательность:</strong> {comment.age || 'Не указан'}</p>
-                            <p><strong>Комментарий:</strong> {comment.text}</p>
-                            <button onClick={() => deleteComment(comment.id)}>Удалить</button>
-                        </div>
-                    ))}
-                </div>
-                <div className="coments">
-                    <h1>Оставьте свой комментарий</h1>  
-                </div>  
-                <div className="modal__comments">
-                    <form onSubmit={handleSubmit}>
-                        <input
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="Ваше имя"
-                            required
-                        />
-                        <input
-                            type="text"
-                            value={age}
-                            onChange={(e) => setAge(e.target.value)}
-                            placeholder="Про какую достопримечательность вы хотите написать"
-                        />
-                        <input
-                            type="text"
-                            value={commentText}
-                            onChange={(e) => setCommentText(e.target.value)}
-                            placeholder="Введите сам комментарий"
-                            required
-                        />
-                        <button className="btn__form" type="submit">
-                            Отправить
-                        </button>
-                    </form>
-                </div>
+  return (
+    <>
+      <div className="container__comments">
+        <div className="comments-list">
+          {comments.map((comment) => (
+            <div key={comment.id} className="comment-item">
+              <p>
+                <strong>Имя:</strong> {comment.name}
+              </p>
+              <p>
+                <strong>Комментарий:</strong> {comment.text}
+              </p>
+              <button
+                className="delete__button"
+                onClick={() => deleteMutation.mutate(comment.id)}
+              >
+                Удалить
+              </button>
             </div>
-        </>
-    );
+          ))}
+        </div>
+        <div className="coments">
+          <h1>Оставьте свой комментарий</h1>
+        </div>
+        <div className="modal__comments">
+          <form onSubmit={handleSubmit}>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Ваше имя"
+              required
+            />
+            <input
+              type="text"
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              placeholder="Введите комментарий"
+              required
+            />
+            <button className="btn__form" type="submit">
+              Отправить
+            </button>
+          </form>
+        </div>
+      </div>
+    </>
+  );
+};
+
+Comments.propTypes = {
+  cardId: PropTypes.string.isRequired,
 };
 
 export default Comments;

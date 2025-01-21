@@ -17,11 +17,14 @@ const Catalog = () => {
     const [hasMore, setHasMore] = useState(true);
     const urlMoc = 'https://672a07666d5fa4901b6f7076.mockapi.io/card/';
     const navigate = useNavigate();
+    const loader = document.getElementById("infinity__scroll");
 
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
-
+            if (loader) {
+              loader.style.display = "flex";
+            }
             const url = new URL(urlMoc);
             url.searchParams.append('page', page);
             url.searchParams.append('limit', 10);
@@ -34,10 +37,10 @@ const Catalog = () => {
                 url.searchParams.append("order", order);
               }
             }
-
-
             try {
                 const response = await fetch(url);
+                console.log('43');
+                
                 if (!response.ok) throw new Error('Ошибка загрузки данных');
                 const newData = await response.json();
 
@@ -47,11 +50,13 @@ const Catalog = () => {
                 console.error('Ошибка:', error);
             } finally {
                 setIsLoading(false);
+                if (loader) {
+                  loader.style.display = "none";
+                }
             }
         };
-
         fetchData();
-    }, [page, filters, searchQuery, sortBy]);
+    }, [page, filters, searchQuery, sortBy, loader]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -64,7 +69,6 @@ const Catalog = () => {
                 setPage((prevPage) => prevPage + 1);
             }
         };
-
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, [isLoading, hasMore]);
@@ -100,9 +104,9 @@ const Catalog = () => {
         <div className="catalog">
             <div className="catalog__card" id="catalog__card">
                 <CreateCard key={data.id} data={data} onCardClick={handleCardClick} />
+            <InfinityScroll />
             </div>
         </div>
-            <InfinityScroll />
         </>
     );
 };

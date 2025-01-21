@@ -15,7 +15,6 @@ const Search = ({ onSearch }) => {
     </div>
   );
 };
-
 Search.propTypes = {
   onSearch: PropTypes.func.isRequired,
 };
